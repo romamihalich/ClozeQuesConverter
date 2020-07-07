@@ -1,0 +1,15 @@
+<begin name=Question 1; sa=0>
+Date of start WW2:
+{1:SHORTANSWER:=22} {1:MULTICHOICE_S:=june~july~august~september~may} {1:SHORTANSWER:=1941} year.
+<end>
+
+<begin name=Question 2; sa=0>
+Match the following cities with the correct state:
+* San Francisco: {1:MULTICHOICE:=California#OK~Arizona#Wrong}
+* Tucson: {1:MULTICHOICE:California#Wrong~%100%Arizona#OK}
+* Los Angeles: {1:MULTICHOICE:=California#OK~Arizona#Wrong}
+* Phoenix: {1:MULTICHOICE:%0%California#Wrong~=Arizona#OK}
+The capital of France is {1:SHORTANSWER:%100%Paris#Congratulations!
+~%50%Marseille#No, that is the second largest city in France (after
+Paris).~*#Wrong answer. The capital of France is Paris, of course.}.
+<end>
