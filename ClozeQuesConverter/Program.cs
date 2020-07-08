@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
 using System.IO;
 using System.Net.Sockets;
 using System.Text;
@@ -9,8 +10,8 @@ namespace ClozeQuesConverter
 {
     class Program
     {
-        static readonly Regex beginRegex = new Regex(@"<begin name=(.*); sa=([0|1])>");
-        static readonly Regex endRegex = new Regex(@"<end>");
+        static readonly Regex beginRegex = new Regex(@"^<begin (.*);\s*([0|1])\s*>$");
+        static readonly Regex endRegex = new Regex(@"^<end>$");
 
         /// <summary>
         /// Ищет следующий вопрос в потоке input
@@ -23,25 +24,32 @@ namespace ClozeQuesConverter
             bool shuffleAnswers = false;
             while (input.EndOfStream == false)
             {
-                string curString = input.ReadLine();
-                if (beginRegex.IsMatch(curString))
+                string currentString = input.ReadLine().Trim();
+                if (beginRegex.IsMatch(currentString))
                 {
                     //init name and shaffleAnswers 
-                    var groups = beginRegex.Match(curString).Groups;
+                    var groups = beginRegex.Match(currentString).Groups;
                     name = groups[1].Value;
                     shuffleAnswers = groups[2].Value == "1" ? true : false;
                     break;
                 }
+                else if (string.IsNullOrEmpty(currentString) == false)
+                    throw new SyntaxErrorException("no <begin>");
             }
             var body = new StringBuilder();
+            bool endFlag = true;
             while (input.EndOfStream == false)
             {
+                endFlag = false;
                 string currentString = input.ReadLine();
-                if (endRegex.IsMatch(currentString) == false)
+                string trimmedCurStr = currentString.Trim();
+                if (endRegex.IsMatch(trimmedCurStr) == false)
                     body.Append(currentString);
-                else break;
+                else { endFlag = true; break; }
             }
             var bodyStr = body.ToString();
+            if (endFlag == false)
+                throw new SyntaxErrorException("no <end>");
             if (string.IsNullOrEmpty(bodyStr))
                 return null;
             return new Question(name, bodyStr, shuffleAnswers);
