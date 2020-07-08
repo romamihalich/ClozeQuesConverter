@@ -1,5 +1,5 @@
 # Синтаксис
-\<begin name=QuestionName; sa=0> // sa = shuffleanswers (может быть 0 или 1)
+\<begin QuestionName;0> // на 2-ом месте shuffleanswers (может быть 0 или 1)
 <br>
 Сам вопрос и cloze код 
 <br>
