@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Net.Sockets;
 using System.Text;
 using System.Text.RegularExpressions;
 
@@ -10,28 +11,6 @@ namespace ClozeQuesConverter
     {
         static readonly Regex beginRegex = new Regex(@"<begin name=(.*); sa=([0|1])>");
         static readonly Regex endRegex = new Regex(@"<end>");
-
-        static readonly string xamlPattern =
-            "<?xml version=\"1.0\" encoding=\"UTF-8\"?><quiz>(.*)</quiz>";
-
-        /// <summary>
-        /// 1-ая группа - название вопроса (Name)
-        /// 2-ая группа - сам вопрос (Body)
-        /// 3-яя группа - ShuffleAnswers
-        ///</summary>
-        static readonly string questPattern =
-            "<question type=\"cloze\">" +
-            "<name><text>(.*)</text>" +
-            "</name>" +
-            "<questiontext>" +
-            "<text><![CDATA[(.*)]]></text>" +
-            "</questiontext>" +
-            "<generalfeedback>" +
-            "<text></text>" +
-            "</generalfeedback>" +
-            "<shuffleanswers>(.*)</shuffleanswers>" +
-            "</question>";
-
 
         /// <summary>
         /// Ищет следующий вопрос в потоке input
@@ -57,9 +36,9 @@ namespace ClozeQuesConverter
             var body = new StringBuilder();
             while (input.EndOfStream == false)
             {
-                string curString = input.ReadLine();
-                if (endRegex.IsMatch(curString) == false)
-                    body.Append(curString);
+                string currentString = input.ReadLine();
+                if (endRegex.IsMatch(currentString) == false)
+                    body.Append(currentString);
                 else break;
             }
             var bodyStr = body.ToString();
@@ -68,25 +47,49 @@ namespace ClozeQuesConverter
             return new Question(name, bodyStr, shuffleAnswers);
         }
 
+        static readonly string questionPattern =
+            "<question type=\"cloze\">" +
+            "<name><text>\n NAME \n</text></name>" +
+            "<questiontext><text><![CDATA[\n BODY \n]]></text></questiontext>" +
+            "<generalfeedback>" +
+            "<text></text>" +
+            "</generalfeedback>" +
+            "<shuffleanswers>\n SHUFFLEANSWERS \n</shuffleanswers>" +
+            "</question>";
 
+        static string ConvertToXml(Question question)
+        {
+            var questXml = questionPattern.Replace("NAME", question.Name)
+                .Replace("BODY", question.Body)
+                .Replace("SHUFFLEANSWERS", question.ShuffleAnswers ? "1" : "0");
+            return questXml;
+        }
+
+        static readonly string xmlPatternBegin =
+            "<?xml version=\"1.0\" encoding=\"UTF-8\"?><quiz>";
+        static readonly string xmlPatternEnd = "</quiz>";
+
+        static void ConvertTxtToXml(string input, string output)
+        {
+            var inputSR = new StreamReader(input);
+            var outputSW = new StreamWriter(output);
+
+            outputSW.WriteLine(xmlPatternBegin);
+            var nextQuestion = GetNextQuestion(inputSR);
+            while(nextQuestion != null)
+            {
+                outputSW.WriteLine(ConvertToXml(nextQuestion));
+                nextQuestion = GetNextQuestion(inputSR);
+            }
+            outputSW.WriteLine(xmlPatternEnd);
+
+            inputSR.Close();
+            outputSW.Close();
+        }
 
         static void Main(string[] args)
         {
-            var input = new StreamReader("test.txt");
-            var output = new StreamWriter("output.xml");
-
-            var questions = new List<Question>();
-            while(input.EndOfStream == false)
-            {
-                var nextQuestion = GetNextQuestion(input);
-                if (nextQuestion != null)
-                    questions.Add(nextQuestion);
-            }
-
-            Console.WriteLine(
-                string.Join("\n", questions)
-                );
-
+            ConvertTxtToXml("test.txt", "output.xml");
             Console.ReadKey();
         }
     }
