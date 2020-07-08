@@ -113,19 +113,50 @@ namespace ClozeQuesConverter
             outputSW.Close();
         }
 
+        static FileInfo GetFileConsole()
+        {
+            FileInfo input;
+            while (true)
+            {
+                input = new FileInfo(Console.ReadLine());
+                if (input.Exists == false)
+                {
+                    Console.WriteLine("Файл не существует");
+                    continue;
+                }
+                if (input.Extension != ".txt")
+                {
+                    Console.WriteLine("Расширение должно быть .txt");
+                    continue;
+                }
+                break;
+            }
+            return input;
+        }
+
         static void Main(string[] args)
         {
-            try
+            while (true)
             {
-                ConvertTxtToXml("test.txt", "output.xml");
-            }
-            catch(SyntaxErrorException ex)
-            {
-                Console.WriteLine(ex.Message);
-            }
+                Console.WriteLine("Введите имя файла (Расширение .txt)");
 
+                var input = GetFileConsole();
+                var output = new FileInfo(input.FullName.Replace(".txt", ".xml"));
 
-            Console.ReadKey();
+                try
+                {
+                    ConvertTxtToXml(input.FullName, output.FullName);
+                }
+                catch (SyntaxErrorException ex)
+                {
+                    Console.WriteLine("Синтаксическая ошибка");
+                    Console.WriteLine(ex.Message + "\n");
+                    continue;
+                }
+
+                Console.WriteLine("Файл успешно сохранен\n");
+
+            }
         }
     }
 }
