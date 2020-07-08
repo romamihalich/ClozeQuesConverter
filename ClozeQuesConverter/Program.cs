@@ -133,7 +133,77 @@ namespace ClozeQuesConverter
             }
             return input;
         }
-
+        //
+        static void Check(string s)
+        {
+            if (s[0] != '{') Console.WriteLine("Ошибка. Выражение должно начинаться с фигурной скобки ( { )");
+            else
+            {
+                if (Char.IsNumber(s[1]) == false) Console.WriteLine("Ошибка. В выражении после открывающей фигурной скобки, должно стоять число, обозначающее вес правильного ответа");//ошибка если после скобки не число
+                else
+                {
+                    int i = 1;
+                    while (Char.IsNumber(s[i]) == true)//пока i-тый число, то идем дальше
+                    {
+                        i++;
+                    }
+                    if (s[i] != ':') Console.WriteLine("Ошибка. В выражении после числа, должно стоять двоеточие");//если после числа не двоеточие, то ошибка
+                    else
+                    {
+                        i++;
+                        string sub = "";//проверка на SHORTANSWER или MULTICHOICE
+                        int j = i;//коэф для цикла ниже
+                        while ((i <= j + 10)&&(i<=s.Length-1))
+                        {
+                            sub = sub + s[i];
+                            i++;
+                        }
+                        if (((sub != "SHORTANSWER") && (sub != "MULTICHOICE")) || ((i < s.Length - 1) && ((sub == "SHORTANSWER") || (sub == "MULTICHOICE")) && (s[i] !=':'))) Console.WriteLine("Ошибка. В выражении после первого двоеточия должен указываться тип вопроса: SHORTANSWER или MULTICHOICE");
+                        else
+                        {
+                            if (sub == "SHORTANSWER")//если один ответ
+                            {
+                                if ((i > s.Length-1)||(s[i] != ':')) Console.WriteLine("Ошибка. В выражении после типа вопроса должно ставиться второе двоеточие");
+                                else
+                                {
+                                    i++;
+                                    if ((i > s.Length - 1)||(s[i]!='=')) Console.WriteLine("Ошибка. В выражении после второго двоеточия должно ставиться знак равно ( = )");
+                                    else
+                                    {
+                                        while ((i < s.Length - 1) && (s[i] != '}'))
+                                        {
+                                            i++;
+                                        }
+                                        if ((s[i] != '}') && (i == s.Length-1)) Console.WriteLine("Ошибка. В выражении после ответа должна ставиться закрывающаяся фигурная скобка ( } )");
+                                        else if ((s[i] == '}') && (i == s.Length-1)) Console.WriteLine("Выражение составлено правильно");
+                                    }
+                                }
+                            }
+                            if (sub == "MULTICHOICE")
+                            {
+                                if (s[i] != ':') Console.WriteLine("Ошибка. В выражении после типа вопроса должно ставиться второе двоеточие");
+                                else
+                                {
+                                    i++;
+                                    if (s[i]!='=') Console.WriteLine("Ошибка. В выражении при выборе вариантов ответов должен быть хотя бы один правильный");
+                                    else
+                                    {
+                                        while ((s[i] != '}') || (s[i] <= s.Length-1))
+                                        {
+                                            i++;
+                                        }
+                                        if ((s[i] != '}') && (i == s.Length-1)) Console.WriteLine("Ошибка. В выражении после ответа должна ставиться закрывающаяся фигурная скобка ( } )");
+                                        else if ((s[i] == '}') && (i == s.Length-1)) Console.WriteLine("Выражение составлено правильно");
+                                    }
+                                }
+                            }
+                        }
+                    }     
+                }
+            }
+        }
+        //
+        
         static void Main(string[] args)
         {
             while (true)
