@@ -18,13 +18,14 @@ namespace ClozeQuesConverter
         /// </summary>
         /// <param name="input"></param>
         /// <returns>Объект типа Question, если не нашлось, то null</returns>
-        static Question GetNextQuestion(StreamReader input)
+        static Question GetNextQuestion(StreamReader input, ref int lineCount)
         {
             string name = string.Empty;
             bool shuffleAnswers = false;
             while (input.EndOfStream == false)
             {
                 string currentString = input.ReadLine().Trim();
+                lineCount++;
                 if (beginRegex.IsMatch(currentString))
                 {
                     //init name and shaffleAnswers 
@@ -34,7 +35,9 @@ namespace ClozeQuesConverter
                     break;
                 }
                 else if (string.IsNullOrEmpty(currentString) == false)
-                    throw new SyntaxErrorException("no <begin>");
+                    throw new SyntaxErrorException($"no <begin>\nline: {lineCount}");
+                if (endRegex.IsMatch(currentString))
+                    throw new SyntaxErrorException($"no <begin>\nline: {lineCount}");
             }
             var body = new StringBuilder();
             bool endFlag = true;
@@ -42,14 +45,17 @@ namespace ClozeQuesConverter
             {
                 endFlag = false;
                 string currentString = input.ReadLine();
+                lineCount++;
                 string trimmedCurStr = currentString.Trim();
                 if (endRegex.IsMatch(trimmedCurStr) == false)
-                    body.Append(currentString);
+                    body.Append(currentString + "<br>"); // br for new line
                 else { endFlag = true; break; }
+                if (beginRegex.IsMatch(trimmedCurStr))
+                    throw new SyntaxErrorException($"no <end>\nline: {lineCount}");
             }
             var bodyStr = body.ToString();
             if (endFlag == false)
-                throw new SyntaxErrorException("no <end>");
+                throw new SyntaxErrorException($"no <end>\nline: {lineCount}");
             if (string.IsNullOrEmpty(bodyStr))
                 return null;
             return new Question(name, bodyStr, shuffleAnswers);
@@ -82,13 +88,25 @@ namespace ClozeQuesConverter
             var inputSR = new StreamReader(input);
             var outputSW = new StreamWriter(output);
 
+            int lineCount = 0;
+
             outputSW.WriteLine(xmlPatternBegin);
-            var nextQuestion = GetNextQuestion(inputSR);
-            while(nextQuestion != null)
+            try
             {
-                outputSW.WriteLine(ConvertToXml(nextQuestion));
-                nextQuestion = GetNextQuestion(inputSR);
+                var nextQuestion = GetNextQuestion(inputSR, ref lineCount);
+
+                while (nextQuestion != null)
+                {
+                    outputSW.WriteLine(ConvertToXml(nextQuestion));
+                    nextQuestion = GetNextQuestion(inputSR, ref lineCount);
+                }
             }
+            catch (SyntaxErrorException)
+            {
+                //Console.WriteLine(ex.Message);
+                throw;
+            }
+
             outputSW.WriteLine(xmlPatternEnd);
 
             inputSR.Close();
@@ -97,7 +115,16 @@ namespace ClozeQuesConverter
 
         static void Main(string[] args)
         {
-            ConvertTxtToXml("test.txt", "output.xml");
+            try
+            {
+                ConvertTxtToXml("test.txt", "output.xml");
+            }
+            catch(SyntaxErrorException ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
+
+
             Console.ReadKey();
         }
     }
