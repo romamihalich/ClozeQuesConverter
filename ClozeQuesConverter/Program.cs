@@ -10,7 +10,7 @@ namespace ClozeQuesConverter
 {
     class Program
     {
-        static readonly Regex beginRegex = new Regex(@"^<begin (.*);\s*([0|1])\s*>$");
+        static readonly Regex beginRegex = new Regex(@"^<begin (.*);\s*([01])\s*>$");
         static readonly Regex endRegex = new Regex(@"^<end>$");
 
         /// <summary>
