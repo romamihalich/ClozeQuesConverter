@@ -134,72 +134,42 @@ namespace ClozeQuesConverter
             return input;
         }
         //
-        static void Check(string s)
+        static void Check1(string s)
         {
-            if (s[0] != '{') Console.WriteLine("Ошибка. Выражение должно начинаться с фигурной скобки ( { )");
+            Regex regex = new Regex(@"{[0-9]{1,}:SHORTANSWER:=.+}");
+            Regex regex1 = new Regex(@"{[0-9]{1,}:SHORTANSWER_C:=.+}");
+            Regex regex2 = new Regex(@"{[0-9]{1,}:NUMERICAL:=[0-9]{1,}}");
+            Regex regex3 = new Regex(@"{[0-9]{1,}:MULTICHOICE:.*=+.+~+.+}");
+            Regex regex4 = new Regex(@"{[0-9]{1,}:MULTICHOICE_V:=+.+~+.+}");
+            Regex regex5 = new Regex(@"{[0-9]{1,}:MULTICHOICE_H:=+.+~+.+}");
+            Regex regex6 = new Regex(@"{[0-9]{1,}:MULTIRESPONSE:=+.+~+.+}");
+            Regex regex7 = new Regex(@"{[0-9]{1,}:MULTIRESPONSE_H:=+.+~+.+}");
+            Regex regex8 = new Regex(@"{[0-9]{1,}:MULTICHOICE_S:=+.+~+.+}");
+            Regex regex9 = new Regex(@"{[0-9]{1,}:MULTICHOICE_VS :=+.+~+.+}");
+            Regex regex10 = new Regex(@"{[0-9]{1,}:MULTICHOICE_HS :=+.+~+.+}");
+            Regex regex11 = new Regex(@"{[0-9]{1,}:MULTIRESPONSE_S :=+.+~+.+}");
+            Regex regex12 = new Regex(@"{[0-9]{1,}:MULTIRESPONSE_HS :=+.+~+.+}");
+            MatchCollection matches = regex.Matches(s);
+            MatchCollection matches1 = regex1.Matches(s);
+            MatchCollection matches2 = regex2.Matches(s);
+            MatchCollection matches3 = regex3.Matches(s);
+            MatchCollection matches4 = regex4.Matches(s);
+            MatchCollection matches5 = regex5.Matches(s);
+            MatchCollection matches6 = regex6.Matches(s);
+            MatchCollection matches7 = regex7.Matches(s);
+            MatchCollection matches8 = regex8.Matches(s);
+            MatchCollection matches9 = regex9.Matches(s);
+            MatchCollection matches10 = regex10.Matches(s);
+            MatchCollection matches11 = regex11.Matches(s);
+            MatchCollection matches12 = regex12.Matches(s);
+            int sum = matches.Count + matches1.Count + matches2.Count + matches3.Count + matches4.Count + matches5.Count + matches6.Count + matches7.Count + matches8.Count + matches9.Count + matches10.Count + matches11.Count + matches12.Count;
+            if (sum > 0)
+            {
+                Console.WriteLine("Выражение задано правильно");
+            }
             else
             {
-                if (Char.IsNumber(s[1]) == false) Console.WriteLine("Ошибка. В выражении после открывающей фигурной скобки, должно стоять число, обозначающее вес правильного ответа");//ошибка если после скобки не число
-                else
-                {
-                    int i = 1;
-                    while (Char.IsNumber(s[i]) == true)//пока i-тый число, то идем дальше
-                    {
-                        i++;
-                    }
-                    if (s[i] != ':') Console.WriteLine("Ошибка. В выражении после числа, должно стоять двоеточие");//если после числа не двоеточие, то ошибка
-                    else
-                    {
-                        i++;
-                        string sub = "";//проверка на SHORTANSWER или MULTICHOICE
-                        int j = i;//коэф для цикла ниже
-                        while ((i <= j + 10)&&(i<=s.Length-1))
-                        {
-                            sub = sub + s[i];
-                            i++;
-                        }
-                        if (((sub != "SHORTANSWER") && (sub != "MULTICHOICE")) || ((i < s.Length - 1) && ((sub == "SHORTANSWER") || (sub == "MULTICHOICE")) && (s[i] !=':'))) Console.WriteLine("Ошибка. В выражении после первого двоеточия должен указываться тип вопроса: SHORTANSWER или MULTICHOICE");
-                        else
-                        {
-                            if (sub == "SHORTANSWER")//если один ответ
-                            {
-                                if ((i > s.Length-1)||(s[i] != ':')) Console.WriteLine("Ошибка. В выражении после типа вопроса должно ставиться второе двоеточие");
-                                else
-                                {
-                                    i++;
-                                    if ((i > s.Length - 1)||(s[i]!='=')) Console.WriteLine("Ошибка. В выражении после второго двоеточия должно ставиться знак равно ( = )");
-                                    else
-                                    {
-                                        while ((i < s.Length - 1) && (s[i] != '}'))
-                                        {
-                                            i++;
-                                        }
-                                        if ((s[i] != '}') && (i == s.Length-1)) Console.WriteLine("Ошибка. В выражении после ответа должна ставиться закрывающаяся фигурная скобка ( } )");
-                                        else if ((s[i] == '}') && (i == s.Length-1)) Console.WriteLine("Выражение составлено правильно");
-                                    }
-                                }
-                            }
-                            if (sub == "MULTICHOICE")
-                            {
-                                if (s[i] != ':') Console.WriteLine("Ошибка. В выражении после типа вопроса должно ставиться второе двоеточие");
-                                else
-                                {
-                                    i++;
-                                    if (s[i]!='=') Console.WriteLine("Ошибка. В выражении при выборе вариантов ответов должен быть хотя бы один правильный");
-                                    else
-                                    {
-                                        while ((s[i] != '}') || (s[i] <= s.Length-1))
-                                        {
-                                            i++;
-                                        }
-                                        if ((s[i] != '}') && (i == s.Length-1)) Console.WriteLine("Ошибка. В выражении после ответа должна ставиться закрывающаяся фигурная скобка ( } )");
-                                        else if ((s[i] == '}') && (i == s.Length-1)) Console.WriteLine("Выражение составлено правильно");
-                                    }
-                                }
-                            }
-                        }
-                    }     
-                }
+                Console.WriteLine("Выражение задано неправильно!");
             }
         }
         //
