@@ -141,11 +141,23 @@ namespace ClozeQuesConverter
             new[] { "SHORTANSWER", "SA", "MW", "SHORTANSWER_C", "SAC", "MWC" };
         static bool IsShortanswer(string str)
         {
-            var regex = new Regex(@"^{\d+:([A-Z_]+):(=|%\d+%)[^~{}#]+(#[^~{}#]+)?(~(=|%\d+%)[^~{}#]+(#[^~{}#]+)?)*}$");
+            //var regex2 = new Regex(@"^{\d+:(?<type>[A-Z_]+):(?<answers>(=|-?%\d+%).+?(#.+)?(~(=|-?%\d+%).+?(#.+?)?)*)}$");
+
+            var regex = new Regex(@"^{\d+:(?<type>[A-Z_]+):(?<answers>(=|-?%\d+%).*[^\\](#.+)?(~(=|-?%\d+%).*[^\\](#.+?)?)*)}$");
+
+            //var regex1 = new Regex(@"^{\d+:([A-Z_]+):(=|%\d+%)[^~{}#]+(#[^~{}#]+)?(~(=|%\d+%)[^~{}#]+(#[^~{}#]+)?)*}$");
+
             if (regex.IsMatch(str) == false)
                 return false;
-            if (shortanswers.Contains(regex.Match(str).Groups[1].Value) == false)
+            var groups = regex.Match(str).Groups;
+            if (shortanswers.Contains(groups["type"].Value) == false)
                 return false;
+
+            //this shit doesn't work
+            var answersGroup = regex.Match(str).Groups["answers"].Value;
+            answersGroup = new Regex(@"\\[#~/""\\]").Replace(answersGroup, "");
+            var answers = answersGroup.Split('~', StringSplitOptions.RemoveEmptyEntries);
+
             return true;
         }
 
