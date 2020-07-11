@@ -149,21 +149,63 @@ namespace ClozeQuesConverter
             return true;
         }
 
+        static void percentage(string s)
+        {
+            int sum = 0;
+            var chisla = new List<string>();//коллекция для чисел
+            int i = 10; //для удобствса счета
+            int counter = 0;//cчетчик количества процентов
+            while (i < s.Length - 1)//идем по строке
+            {
+                if (s[i] == '%')//если встретили процент
+                {
+                    counter++;//увеличиваем счетчик
+                    string sub = "";//строка для составления числа в процентах
+                    i++;//идем дальше по циклу
+                    while ((i < s.Length - 1) && (s[i] != '%'))//пока не конец строки или конец процентов
+                    {
+                        sub = sub + s[i];//считываем то что в процентах
+                        i++;
+                    }
+                    if (s[i] == '%')//при закрывающемся процетне увеличиваем счётчик и идем дальше
+                    {
+                        counter++;
+                        i++;
+                    }
+                    chisla.Add(sub);//добавляем в коллекцию число
+                }
+                i++;
+            }
+            if (counter % 2 != 0) Console.WriteLine("Выражение задано неправильно!");//если недосчет процетнов
+            else
+            {
+                foreach (var chislo in chisla)//для каждого числа
+                {
+                    int vivod = 0;
+                    bool isInt = Int32.TryParse(chislo, out vivod);//конвертируем стринг в инт  
+                    if (isInt == false) { Console.WriteLine("Выражение задано неправильно!"); break; }//если в процентах не только число то ошибка и выход из цикла
+                    else sum = sum + vivod;//иначе суммируем
+                }
+                if (sum>100) Console.WriteLine("Выражение задано неправильно!");//все проценты должны быть не больше ста
+                else Console.WriteLine("Выражение задано правильно!");
+            }
+        }
+
         static void Check1(string s)
         {
-            Regex regex = new Regex(@"{[0-9]{1,}:SHORTANSWER:=.+}");
-            Regex regex1 = new Regex(@"{[0-9]{1,}:SHORTANSWER_C:=.+}");
-            Regex regex2 = new Regex(@"{[0-9]{1,}:NUMERICAL:=[0-9]{1,}}");
-            Regex regex3 = new Regex(@"{[0-9]{1,}:MULTICHOICE:.*=+.+~+.+}");
-            Regex regex4 = new Regex(@"{[0-9]{1,}:MULTICHOICE_V:=+.+~+.+}");
-            Regex regex5 = new Regex(@"{[0-9]{1,}:MULTICHOICE_H:=+.+~+.+}");
-            Regex regex6 = new Regex(@"{[0-9]{1,}:MULTIRESPONSE:=+.+~+.+}");
-            Regex regex7 = new Regex(@"{[0-9]{1,}:MULTIRESPONSE_H:=+.+~+.+}");
-            Regex regex8 = new Regex(@"{[0-9]{1,}:MULTICHOICE_S:=+.+~+.+}");
-            Regex regex9 = new Regex(@"{[0-9]{1,}:MULTICHOICE_VS :=+.+~+.+}");
-            Regex regex10 = new Regex(@"{[0-9]{1,}:MULTICHOICE_HS :=+.+~+.+}");
-            Regex regex11 = new Regex(@"{[0-9]{1,}:MULTIRESPONSE_S :=+.+~+.+}");
-            Regex regex12 = new Regex(@"{[0-9]{1,}:MULTIRESPONSE_HS :=+.+~+.+}");
+            Regex regex = new Regex(@"{[0-9]{1,}:SHORTANSWER:(=|%).+}");
+            Regex regex1 = new Regex(@"{[0-9]{1,}:SHORTANSWER_C:(=|%).+}");
+            Regex regex2 = new Regex(@"{[0-9]{1,}:NUMERICAL:(=|%)[0-9]{1,}}");
+            Regex regex3 = new Regex(@"{[0-9]{1,}:MULTICHOICE:.*(=|%)+.+~+.+}");
+            Regex regex4 = new Regex(@"{[0-9]{1,}:MULTICHOICE_V:.*(=|%)+.+~+.+}");
+            Regex regex5 = new Regex(@"{[0-9]{1,}:MULTICHOICE_H:.*(=|%)+.+~+.+}");
+            Regex regex6 = new Regex(@"{[0-9]{1,}:MULTIRESPONSE:.*(=|%)+.+~+.+}");
+            Regex regex7 = new Regex(@"{[0-9]{1,}:MULTIRESPONSE_H:.*(=|%)+.+~+.+}");
+            Regex regex8 = new Regex(@"{[0-9]{1,}:MULTICHOICE_S:.*(=|%)+.+~+.+}");
+            Regex regex9 = new Regex(@"{[0-9]{1,}:MULTICHOICE_VS :.*(=|%)+.+~+.+}");
+            Regex regex10 = new Regex(@"{[0-9]{1,}:MULTICHOICE_HS :.*(=|%)+.+~+.+}");
+            Regex regex11 = new Regex(@"{[0-9]{1,}:MULTIRESPONSE_S :.*(=|%)+.+~+.+}");
+            Regex regex12 = new Regex(@"{[0-9]{1,}:MULTIRESPONSE_HS :.*(=|%)+.+~+.+}");
             MatchCollection matches = regex.Matches(s);
             MatchCollection matches1 = regex1.Matches(s);
             MatchCollection matches2 = regex2.Matches(s);
@@ -180,6 +222,7 @@ namespace ClozeQuesConverter
             int sum = matches.Count + matches1.Count + matches2.Count + matches3.Count + matches4.Count + matches5.Count + matches6.Count + matches7.Count + matches8.Count + matches9.Count + matches10.Count + matches11.Count + matches12.Count;
             if (sum > 0)
             {
+                percentage(s);
                 Console.WriteLine("Выражение задано правильно");
             }
             else
