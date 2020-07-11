@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Data;
 using System.IO;
+using System.Linq;
 using System.Net.Sockets;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -134,6 +135,20 @@ namespace ClozeQuesConverter
             return input;
         }
         //
+
+
+        static readonly string[] shortanswers =
+            new[] { "SHORTANSWER", "SA", "MW", "SHORTANSWER_C", "SAC", "MWC" };
+        static bool IsShortanswer(string str)
+        {
+            var regex = new Regex(@"^{\d+:([A-Z_]+):(=|%\d+%)[^~{}#]+(#[^~{}#]+)?(~(=|%\d+%)[^~{}#]+(#[^~{}#]+)?)*}$");
+            if (regex.IsMatch(str) == false)
+                return false;
+            if (shortanswers.Contains(regex.Match(str).Groups[1].Value) == false)
+                return false;
+            return true;
+        }
+
         static void Check1(string s)
         {
             Regex regex = new Regex(@"{[0-9]{1,}:SHORTANSWER:=.+}");
