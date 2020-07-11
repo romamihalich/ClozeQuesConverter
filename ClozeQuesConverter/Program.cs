@@ -86,8 +86,8 @@ namespace ClozeQuesConverter
 
         static void ConvertTxtToXml(string input, string output)
         {
-            var inputSR = new StreamReader(input);
-            var outputSW = new StreamWriter(output);
+            var inputSR = new StreamReader(input, Encoding.UTF8);
+            var outputSW = new StreamWriter(output, false, Encoding.UTF8);
 
             int lineCount = 0;
 
