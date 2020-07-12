@@ -1,16 +1,51 @@
 <begin Question 1;0>
 Date of start WW2:
-{1:SHORTANSWER:=22} {1:MULTICHOICE_S:=june~july~august~september~may} {1:SHORTANSWER:=1941} year.
-<end> 
+<cloze SHORTANSWER; 1>
+%100% 22
+</cloze>
+
+<cloze MULTICHOICE_S; 1>
+%100% june
+%0% july
+%0% august
+%0% september
+%0% may
+</cloze>
+
+<cloze SHORTANSWER; 1>
+%100% 1941
+</cloze>
+year.
+<end>
 
 
 <begin Question 2; 0 >                  
 Match the following cities with the correct state:
-* San Francisco: {1:MULTICHOICE:=California#OK~Arizona#Wrong}
-* Tucson: {1:MULTICHOICE:California#Wrong~%100%Arizona#OK}
-* Los Angeles: {1:MULTICHOICE:=California#OK~Arizona#Wrong}
-* Phoenix: {1:MULTICHOICE:%0%California#Wrong~=Arizona#OK}
-The capital of France is {1:SHORTANSWER:%100%Paris#Congratulations!
-~%50%Marseille#No, that is the second largest city in France (after
-Paris).~*#Wrong answer. The capital of France is Paris, of course.}.
+* San Francisco: 
+<cloze MULTICHOICE; 1>
+%100% California<feedback>OK
+%0% Arizona<feedback>Wrong
+</cloze>
+* Tucson: 
+<cloze MULTICHOICE; 1>
+%0% California<feedback>Wrong
+%100% Arizona<feedback>OK
+</cloze>
+* Los Angeles:
+<cloze MULTICHOICE; 1>
+%100% California<feedback>OK
+%0% Arizona<feedback>Wrong
+</cloze>
+* Phoenix: 
+<cloze MULTICHOICE; 1>
+%0% California<feedback>Wrong
+%100% Arizona<feedback>Ok
+</cloze>
+
+The capital of France is 
+<cloze SHORTANSWER; 1>
+%100% Paris<feedback>Congratulations!
+%50% Marseille<feedback>No, that is the second largest city in France (after Paris).
+%0% *<feedback>Wrong answer. The capital of France is Paris, of course.
+</cloze>
 <end>
