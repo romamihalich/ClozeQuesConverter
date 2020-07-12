@@ -36,9 +36,7 @@ namespace ClozeQuesConverter
                     break;
                 }
                 else if (string.IsNullOrEmpty(currentLine) == false)
-                    throw new SyntaxErrorException($"no <begin>\nline: {lineCount}");
-                if (endRegex.IsMatch(currentLine))
-                    throw new SyntaxErrorException($"no <begin>\nline: {lineCount}");
+                    throw new SyntaxErrorException($"area outside of question must be empty or white space\nline: {lineCount}");
             }
             var body = new StringBuilder();
             bool endFlag = true;
@@ -49,9 +47,9 @@ namespace ClozeQuesConverter
                 lineCount++;
                 string trimmedCurLine = currentLine.Trim();
                 if (beginRegex.IsMatch(trimmedCurLine))
-                    throw new SyntaxErrorException($"no <end>\nline: {lineCount}");
+                    throw new SyntaxErrorException($"trying to create new question inside {name}\nline: {lineCount}");
                 if (endClozeRegex.IsMatch(trimmedCurLine))
-                    throw new SyntaxErrorException($"cloze error\nline: {lineCount}");
+                    throw new SyntaxErrorException($"trying to end cloze question, that doesn't exist\nline: {lineCount}");
                 if (endRegex.IsMatch(trimmedCurLine) == false)
                 {
                     if (beginClozeRegex.IsMatch(trimmedCurLine))
@@ -62,7 +60,7 @@ namespace ClozeQuesConverter
             }
             var bodyStr = body.ToString();
             if (endFlag == false)
-                throw new SyntaxErrorException($"no <end>\nline: {lineCount}");
+                throw new SyntaxErrorException($"couldn't find end in {name}\nline: {lineCount}");
             if (string.IsNullOrEmpty(bodyStr))
                 return null;
             return new Question(name, bodyStr, shuffleAnswers);
@@ -85,17 +83,17 @@ namespace ClozeQuesConverter
                 endClozeFlag = false;
                 var currentLine = input.ReadLine().Trim();
                 lineCount++;
+                if (beginClozeRegex.IsMatch(currentLine))
+                    throw new SyntaxErrorException($"trying to create new cloze question inside cloze question\nline: {lineCount}");
                 if (endClozeRegex.IsMatch(currentLine) == false)
                 {
                     //TODO: add answers check
                     answers.Add(currentLine);
                 }
                 else { endClozeFlag = true; break; }
-                if (beginClozeRegex.IsMatch(currentLine))
-                    throw new SyntaxErrorException($"cloze error\nline: {lineCount}");
             }
             if (endClozeFlag == false)
-                throw new SyntaxErrorException($"cloze error\nline: {lineCount}");
+                throw new SyntaxErrorException($"couldn't find end in cloze question\nline: {lineCount}");
             if (answers.Count == 0)
                 throw new SyntaxErrorException($"cloze question must contain at least one answer\nline: {lineCount}");
             return new Cloze(value, type, answers);
