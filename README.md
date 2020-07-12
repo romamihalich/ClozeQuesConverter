@@ -20,6 +20,4 @@
 <br>
 \</cloze>
 <br>
-year.
-<br>
 Пример в файле test.txt
