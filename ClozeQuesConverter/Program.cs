@@ -25,19 +25,19 @@ namespace ClozeQuesConverter
             bool shuffleAnswers = false;
             while (input.EndOfStream == false)
             {
-                string currentString = input.ReadLine().Trim();
+                string currentLine = input.ReadLine().Trim();
                 lineCount++;
-                if (beginRegex.IsMatch(currentString))
+                if (beginRegex.IsMatch(currentLine))
                 {
                     //init name and shaffleAnswers 
-                    var groups = beginRegex.Match(currentString).Groups;
+                    var groups = beginRegex.Match(currentLine).Groups;
                     name = groups[1].Value;
                     shuffleAnswers = groups[2].Value == "1" ? true : false;
                     break;
                 }
-                else if (string.IsNullOrEmpty(currentString) == false)
+                else if (string.IsNullOrEmpty(currentLine) == false)
                     throw new SyntaxErrorException($"no <begin>\nline: {lineCount}");
-                if (endRegex.IsMatch(currentString))
+                if (endRegex.IsMatch(currentLine))
                     throw new SyntaxErrorException($"no <begin>\nline: {lineCount}");
             }
             var body = new StringBuilder();
@@ -45,14 +45,20 @@ namespace ClozeQuesConverter
             while (input.EndOfStream == false)
             {
                 endFlag = false;
-                string currentString = input.ReadLine();
+                string currentLine = input.ReadLine();
                 lineCount++;
-                string trimmedCurStr = currentString.Trim();
-                if (endRegex.IsMatch(trimmedCurStr) == false)
-                    body.Append(currentString + "<br>"); // br for new line
-                else { endFlag = true; break; }
-                if (beginRegex.IsMatch(trimmedCurStr))
+                string trimmedCurLine = currentLine.Trim();
+                if (beginRegex.IsMatch(trimmedCurLine))
                     throw new SyntaxErrorException($"no <end>\nline: {lineCount}");
+                if (endClozeRegex.IsMatch(trimmedCurLine))
+                    throw new SyntaxErrorException($"cloze error\nline: {lineCount}");
+                if (endRegex.IsMatch(trimmedCurLine) == false)
+                {
+                    if (beginClozeRegex.IsMatch(trimmedCurLine))
+                        body.Append(GetNextCloze(input, trimmedCurLine, ref lineCount));
+                    else body.Append(currentLine);
+                }
+                else { endFlag = true; break; }
             }
             var bodyStr = body.ToString();
             if (endFlag == false)
@@ -60,6 +66,40 @@ namespace ClozeQuesConverter
             if (string.IsNullOrEmpty(bodyStr))
                 return null;
             return new Question(name, bodyStr, shuffleAnswers);
+        }
+
+
+        static readonly Regex beginClozeRegex = new Regex(@"^<cloze (?<type>[A-Z_]+);\s*(?<value>\d+)\s*>$");
+        static readonly Regex endClozeRegex = new Regex(@"^</cloze>$");
+        
+        static Cloze GetNextCloze(StreamReader input, string first, ref int lineCount)
+        {
+            var groups = beginClozeRegex.Match(first).Groups;
+            var type = groups["type"].Value;
+            var value = int.Parse(groups["value"].Value);
+
+            var answers = new List<string>();
+            bool endClozeFlag = true;
+            while (input.EndOfStream == false)
+            {
+                endClozeFlag = false;
+                var currentLine = input.ReadLine().Trim();
+                lineCount++;
+                if (endClozeRegex.IsMatch(currentLine) == false)
+                {
+                    //TODO: add answers check
+                    answers.Add(currentLine);
+                }
+                else { endClozeFlag = true; break; }
+                if (beginClozeRegex.IsMatch(currentLine))
+                    throw new SyntaxErrorException($"cloze error\nline: {lineCount}");
+            }
+            if (endClozeFlag == false)
+                throw new SyntaxErrorException($"cloze error\nline: {lineCount}");
+            if (answers.Count == 0)
+                throw new SyntaxErrorException($"cloze question must contain at least one answer\n line: {lineCount}");
+
+            return new Cloze(value, type, answers);
         }
 
         static readonly string questionPattern =
