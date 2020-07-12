@@ -274,7 +274,6 @@ namespace ClozeQuesConverter
             int sum = matches.Count + matches1.Count + matches2.Count + matches3.Count + matches4.Count + matches5.Count + matches6.Count + matches7.Count + matches8.Count + matches9.Count + matches10.Count + matches11.Count + matches12.Count;
             if (sum > 0)
             {
-                percentage(s);
                 Console.WriteLine("Выражение задано правильно");
             }
             else
