@@ -97,8 +97,7 @@ namespace ClozeQuesConverter
             if (endClozeFlag == false)
                 throw new SyntaxErrorException($"cloze error\nline: {lineCount}");
             if (answers.Count == 0)
-                throw new SyntaxErrorException($"cloze question must contain at least one answer\n line: {lineCount}");
-
+                throw new SyntaxErrorException($"cloze question must contain at least one answer\nline: {lineCount}");
             return new Cloze(value, type, answers);
         }
 
