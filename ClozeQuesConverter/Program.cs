@@ -200,45 +200,50 @@ namespace ClozeQuesConverter
             return true;
         }
 
-        static void percentage(string s)
+        static bool Check2(string s)
         {
-            int sum = 0;
-            var chisla = new List<string>();//коллекция для чисел
-            int i = 10; //для удобствса счета
-            int counter = 0;//cчетчик количества процентов
-            while (i < s.Length - 1)//идем по строке
-            {
-                if (s[i] == '%')//если встретили процент
-                {
-                    counter++;//увеличиваем счетчик
-                    string sub = "";//строка для составления числа в процентах
-                    i++;//идем дальше по циклу
-                    while ((i < s.Length - 1) && (s[i] != '%'))//пока не конец строки или конец процентов
-                    {
-                        sub = sub + s[i];//считываем то что в процентах
-                        i++;
-                    }
-                    if (s[i] == '%')//при закрывающемся процетне увеличиваем счётчик и идем дальше
-                    {
-                        counter++;
-                        i++;
-                    }
-                    chisla.Add(sub);//добавляем в коллекцию число
-                }
-                i++;
-            }
-            if (counter % 2 != 0) Console.WriteLine("Выражение задано неправильно!");//если недосчет процетнов
+            Regex regex = new Regex(@"^%-?\d+%(.*?)<feedback>(.*)$");
+            if (regex.IsMatch(s) == false)
+                return false;
             else
             {
-                foreach (var chislo in chisla)//для каждого числа
+                int counter = 0;
+                var groups = Regex.Match(s, @"^%-?\d+%(.*?)<feedback>(.*)$");
+                string sub1 = groups.Groups[1].Value;
+                string sub2 = groups.Groups[2].Value;
+                int i = 0;
+                while (i < sub1.Length - 1)
                 {
-                    int vivod = 0;
-                    bool isInt = Int32.TryParse(chislo, out vivod);//конвертируем стринг в инт  
-                    if (isInt == false) { Console.WriteLine("Выражение задано неправильно!"); break; }//если в процентах не только число то ошибка и выход из цикла
-                    else sum = sum + vivod;//иначе суммируем
+                    if ((sub1[i]=='}')|| (sub1[i] == '#') || (sub1[i] == '~') || (sub1[i] == '/') || (sub1[i] == '"'))
+                    {
+                        if (i == 0)
+                        {
+                            counter++;
+                        }
+                        else
+                        {
+                            if (sub1[i - 1] != '\\') counter++; 
+                        }
+                    }
+                    i++;
                 }
-                if (sum>100) Console.WriteLine("Выражение задано неправильно!");//все проценты должны быть не больше ста
-                else Console.WriteLine("Выражение задано правильно!");
+                while (i < sub2.Length - 1)
+                {
+                    if ((sub2[i] == '}') || (sub2[i] == '#') || (sub2[i] == '~') || (sub2[i] == '/') || (sub2[i] == '"'))
+                    {
+                        if (i == 0)
+                        {
+                            counter++;
+                        }
+                        else
+                        {
+                            if (sub2[i - 1] != '\\') counter++;
+                        }
+                    }
+                    i++;
+                }
+                if (counter == 0) return true;
+                else return false;
             }
         }
 
