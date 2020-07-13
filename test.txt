@@ -49,3 +49,11 @@ The capital of France is
 %0% *<feedback>Wrong answer. The capital of France is Paris, of course.
 </cloze>
 <end>
+
+<begin Numerical test; 0>
+23 + 0.8 =
+<cloze NUMERICAL; 2>
+%100% 23.8:0.1<feedback> nice
+%50% 23.8:2<feedback> too far, but ok
+</cloze>
+<end>
