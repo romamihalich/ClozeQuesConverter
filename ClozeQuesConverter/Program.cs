@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Net.Sockets;
@@ -93,6 +94,9 @@ namespace ClozeQuesConverter
                     var currentAnswer = new Answer(currentLine);
                     //TODO: add answers check
                     // check body and feedback
+                    if (result.IsNumerical())
+                        if (CheckNumericalAnswer(currentAnswer.Body) == false)
+                            throw new SyntaxErrorException($"wrong format\nline: {lineCount}");
                     result.Answers.Add(currentAnswer);
                 }
                 else { endClozeFlag = true; break; }
@@ -178,6 +182,25 @@ namespace ClozeQuesConverter
         }
         //
 
+        static readonly Regex numericalRegex =
+            new Regex(@"^(?<answer>.*?)(:(?<range>.*))?$");
+        static bool CheckNumericalAnswer(string str)
+        {
+            var groups = numericalRegex.Match(str).Groups;
+
+            if (groups["answer"].Success == false)
+                return false;
+     
+            if (double.TryParse(groups["answer"].Value, NumberStyles.Any, CultureInfo.InvariantCulture, out double answer) == false)
+                return false;
+
+            if (groups["range"].Success == false)
+                return true;
+            if (double.TryParse(groups["range"].Value, NumberStyles.Any, CultureInfo.InvariantCulture, out double range) == false)
+                return false;
+
+            return true;
+        }
 
         static readonly string[] shortanswers =
             new[] { "SHORTANSWER", "SA", "MW", "SHORTANSWER_C", "SAC", "MWC" };
