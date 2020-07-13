@@ -12,7 +12,7 @@ namespace ClozeQuesConverter
         public string Feedback { get; }
 
         private static readonly Regex answerRegex
-            = new Regex(@"^%(?<percentage>-?\d+)%(?<body>.*)(<feedback>(?<feedback>.*))?$");
+            = new Regex(@"^%(?<percentage>-?\d+)%(?<body>.*?)(<feedback>(?<feedback>.*))?$");
         public Answer(string str)
         {
             var groups = answerRegex.Match(str).Groups;
