@@ -41,6 +41,7 @@ namespace ClozeQuesConverter
             }
             var body = new StringBuilder();
             bool endFlag = true;
+            int clozeCount = 0;
             while (input.EndOfStream == false)
             {
                 endFlag = false;
@@ -54,7 +55,10 @@ namespace ClozeQuesConverter
                 if (endRegex.IsMatch(trimmedCurLine) == false)
                 {
                     if (beginClozeRegex.IsMatch(trimmedCurLine))
+                    {
                         body.Append(GetNextCloze(input, trimmedCurLine, ref lineCount));
+                        clozeCount++;
+                    }
                     else body.Append(currentLine);
                 }
                 else { endFlag = true; break; }
@@ -64,6 +68,8 @@ namespace ClozeQuesConverter
                 throw new SyntaxErrorException($"couldn't find end in {name}\nline: {lineCount}");
             if (string.IsNullOrEmpty(bodyStr))
                 return null;
+            if (clozeCount == 0)
+                throw new SyntaxErrorException($"question must contain at least one cloze question\n line: {lineCount}");
             return new Question(name, bodyStr, shuffleAnswers);
         }
 
@@ -92,6 +98,8 @@ namespace ClozeQuesConverter
                 if (endClozeRegex.IsMatch(currentLine) == false)
                 {
                     var currentAnswer = new Answer(currentLine);
+                    if (currentAnswer.Percentage > 100 || currentAnswer.Percentage < -100)
+                        throw new SyntaxErrorException($"percentage must be in range [-100,100]\nline: {lineCount}");
                     //TODO: add answers check
                     // check body and feedback
                     if (result.IsNumerical())
@@ -105,6 +113,9 @@ namespace ClozeQuesConverter
                 throw new SyntaxErrorException($"couldn't find end in cloze question\nline: {lineCount}");
             if (result.Answers.Count == 0)
                 throw new SyntaxErrorException($"cloze question must contain at least one answer\nline: {lineCount}");
+            if (result.IsMultiresponse() == false) 
+                if (result.Answers.Where(x => (x.Percentage == 100)).Count() == 0)
+                    throw new SyntaxErrorException($"cloze question must contain at least one answer with 100%\nline: {lineCount}");
             return result;
         }
 
