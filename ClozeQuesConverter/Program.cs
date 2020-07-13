@@ -233,43 +233,70 @@ namespace ClozeQuesConverter
                 return false;
             else
             {
-                int counter = 0;
                 var groups = Regex.Match(s, @"^%-?\d+%(.*?)<feedback>(.*)$");
                 string sub1 = groups.Groups[1].Value;
                 string sub2 = groups.Groups[2].Value;
                 int i = 0;
-                while (i < sub1.Length - 1)
+                while (i <= sub1.Length - 1)
                 {
-                    if ((sub1[i]=='}')|| (sub1[i] == '#') || (sub1[i] == '~') || (sub1[i] == '/') || (sub1[i] == '"'))
+                    if ((sub1[i]=='}')|| (sub1[i] == '#') || (sub1[i] == '~') || (sub1[i] == '/') || (sub1[i] == '\"'))
                     {
                         if (i == 0)
                         {
-                            counter++;
+                            return false;
                         }
                         else
                         {
-                            if (sub1[i - 1] != '\\') counter++; 
+                            if (sub1[i - 1] != '\\') return false;  
                         }
                     }
+                    if (sub1[i] == '\\')
+                    {
+                        if (i < sub1.Length - 1)
+                        {
+                            if ((sub1[i + 1] == '}') || (sub1[i + 1] == '#') || (sub1[i + 1] == '~') || (sub1[i + 1] == '/') || (sub1[i + 1] == '\"') || (sub1[i + 1] == '\\')) i++;
+                            else
+                            {
+                                return false;
+                            }
+                            
+                        }
+                        
+                    }
+                    if ((i == sub1.Length - 1)&&(sub1[i] == '\\')&&(sub1[i-1]!='\\')) return false;
                     i++;
                 }
-                while (i < sub2.Length - 1)
+                i = 0;
+                while (i <= sub2.Length - 1)
                 {
-                    if ((sub2[i] == '}') || (sub2[i] == '#') || (sub2[i] == '~') || (sub2[i] == '/') || (sub2[i] == '"'))
+                    if ((sub2[i] == '}') || (sub2[i] == '#') || (sub2[i] == '~') || (sub2[i] == '/') || (sub2[i] == '\"'))
                     {
                         if (i == 0)
                         {
-                            counter++;
+                            return false;
                         }
                         else
                         {
-                            if (sub2[i - 1] != '\\') counter++;
+                            if (sub2[i - 1] != '\\') return false;
                         }
                     }
+                    if (sub2[i] == '\\')
+                    {
+                        if (i < sub2.Length - 1)
+                        {
+                            if ((sub2[i + 1] == '}') || (sub2[i + 1] == '#') || (sub2[i + 1] == '~') || (sub2[i + 1] == '/') || (sub2[i + 1] == '\"') || (sub2[i + 1] == '\\')) i++;
+                            else
+                            {
+                                return false;
+                            }
+
+                        }
+
+                    }
+                    if ((i == sub2.Length - 1) && (sub2[i] == '\\') && (sub2[i - 1] != '\\')) return false;
                     i++;
                 }
-                if (counter == 0) return true;
-                else return false;
+                return true;
             }
         }
 
