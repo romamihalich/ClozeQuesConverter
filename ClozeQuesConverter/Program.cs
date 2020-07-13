@@ -76,7 +76,7 @@ namespace ClozeQuesConverter
             var type = groups["type"].Value;
             var value = int.Parse(groups["value"].Value);
 
-            var answers = new List<string>();
+            var answers = new List<Answer>();
             bool endClozeFlag = true;
             while (input.EndOfStream == false)
             {
@@ -87,8 +87,10 @@ namespace ClozeQuesConverter
                     throw new SyntaxErrorException($"trying to create new cloze question inside cloze question\nline: {lineCount}");
                 if (endClozeRegex.IsMatch(currentLine) == false)
                 {
+                    var currentAnswer = new Answer(currentLine);
                     //TODO: add answers check
-                    answers.Add(currentLine);
+                    // check body and feedback
+                    answers.Add(currentAnswer);
                 }
                 else { endClozeFlag = true; break; }
             }

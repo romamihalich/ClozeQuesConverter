@@ -10,9 +10,9 @@ namespace ClozeQuesConverter
     {
         public int Value { get; }
         public string Type { get; }
-        public List<string> Answers { get; set; }
+        public List<Answer> Answers { get; set; }
 
-        public Cloze(int value, string type, List<string> answers)
+        public Cloze(int value, string type, List<Answer> answers)
         {
             Value = value;
             Type = type;
@@ -21,8 +21,7 @@ namespace ClozeQuesConverter
 
         public override string ToString()
         {
-            var ans = Answers.Select(x => x.Replace("<feedback>", "#"));
-            return $"{{{Value}:{Type}:{string.Join("~", ans)}}}";
+            return $"{{{Value}:{Type}:{string.Join("~", Answers)}}}";
         }
     }
 }
