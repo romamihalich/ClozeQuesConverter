@@ -76,7 +76,10 @@ namespace ClozeQuesConverter
             var type = groups["type"].Value;
             var value = int.Parse(groups["value"].Value);
 
-            var answers = new List<Answer>();
+            var result = new Cloze(value, type, new List<Answer>());
+            if (result.IsTypeValid() == false)
+                throw new SyntaxErrorException($"this type doesn't exist\nline: {lineCount}");
+
             bool endClozeFlag = true;
             while (input.EndOfStream == false)
             {
@@ -90,15 +93,15 @@ namespace ClozeQuesConverter
                     var currentAnswer = new Answer(currentLine);
                     //TODO: add answers check
                     // check body and feedback
-                    answers.Add(currentAnswer);
+                    result.Answers.Add(currentAnswer);
                 }
                 else { endClozeFlag = true; break; }
             }
             if (endClozeFlag == false)
                 throw new SyntaxErrorException($"couldn't find end in cloze question\nline: {lineCount}");
-            if (answers.Count == 0)
+            if (result.Answers.Count == 0)
                 throw new SyntaxErrorException($"cloze question must contain at least one answer\nline: {lineCount}");
-            return new Cloze(value, type, answers);
+            return result;
         }
 
         static readonly string questionPattern =
