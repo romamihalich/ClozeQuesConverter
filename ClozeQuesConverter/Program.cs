@@ -188,15 +188,15 @@ namespace ClozeQuesConverter
         {
             var groups = numericalRegex.Match(str).Groups;
 
-            if (groups["answer"].Success == false)
-                return false;
-     
-            if (double.TryParse(groups["answer"].Value, NumberStyles.Any, CultureInfo.InvariantCulture, out double answer) == false)
+            if (groups["answer"].Success == false
+                || groups["answer"].Value != groups["answer"].Value.Trim()
+                || double.TryParse(groups["answer"].Value, NumberStyles.Any, CultureInfo.InvariantCulture, out double answer) == false)
                 return false;
 
             if (groups["range"].Success == false)
                 return true;
-            if (double.TryParse(groups["range"].Value, NumberStyles.Any, CultureInfo.InvariantCulture, out double range) == false)
+            if (groups["range"].Value != groups["range"].Value.Trim()
+                || double.TryParse(groups["range"].Value, NumberStyles.Any, CultureInfo.InvariantCulture, out double range) == false)
                 return false;
 
             return true;
