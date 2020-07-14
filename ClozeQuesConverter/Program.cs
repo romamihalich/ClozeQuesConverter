@@ -74,7 +74,7 @@ namespace ClozeQuesConverter
         }
 
 
-        static readonly Regex beginClozeRegex = new Regex(@"^<cloze (?<type>[A-Z_]+);\s*(?<value>\d+)\s*>$");
+        static readonly Regex beginClozeRegex = new Regex(@"^<cloze\s+(?<type>[A-Z_]+)\s*;\s*(?<value>\d+)\s*>$");
         static readonly Regex endClozeRegex = new Regex(@"^</cloze>$");
         
         static Cloze GetNextCloze(StreamReader input, string first, ref int lineCount)
