@@ -98,6 +98,8 @@ namespace ClozeQuesConverter
                 if (endClozeRegex.IsMatch(currentLine) == false)
                 {
                     var currentAnswer = new Answer(currentLine);
+                    if (string.IsNullOrEmpty(currentAnswer.Body))
+                        throw new SyntaxErrorException($"wrong format\nline: {lineCount}");
                     if (currentAnswer.Percentage > 100 || currentAnswer.Percentage < -100)
                         throw new SyntaxErrorException($"percentage must be in range [-100,100]\nline: {lineCount}");
                     //TODO: add answers check

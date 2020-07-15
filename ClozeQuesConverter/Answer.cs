@@ -15,6 +15,8 @@ namespace ClozeQuesConverter
             = new Regex(@"^%(?<percentage>-?\d+)%(?<body>.*?)(<feedback>(?<feedback>.*))?$");
         public Answer(string str)
         {
+            if (answerRegex.IsMatch(str) == false)
+                return;
             var groups = answerRegex.Match(str).Groups;
             Percentage = int.Parse(groups["percentage"].Value);
             Body = groups["body"].Value.Trim();
