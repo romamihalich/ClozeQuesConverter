@@ -230,8 +230,8 @@ namespace ClozeQuesConverter
                 i++;
             }
         }
-        
-        
+
+        static readonly Regex txtRegex = new Regex(@".txt$");
         static void Main(string[] args)
         {
             while (true)
@@ -239,7 +239,7 @@ namespace ClozeQuesConverter
                 Console.WriteLine("Введите имя файла (Расширение .txt)");
 
                 var input = GetFileConsole();
-                var output = new FileInfo(input.FullName.Replace(".txt", ".xml"));
+                var output = new FileInfo(Path.Combine(input.DirectoryName, txtRegex.Replace(input.Name, ".xml")));
 
                 try
                 {
@@ -263,7 +263,7 @@ namespace ClozeQuesConverter
                     continue;
                 }
 
-                Console.WriteLine("Файл успешно сохранен\n");
+                Console.WriteLine($"Файл {output.Name} успешно сохранен в {output.DirectoryName}\n");
 
             }
         }
