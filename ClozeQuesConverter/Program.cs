@@ -49,7 +49,7 @@ namespace ClozeQuesConverter
                 lineCount++;
                 string trimmedCurLine = currentLine.Trim();
                 if (beginRegex.IsMatch(trimmedCurLine))
-                    throw new SyntaxErrorException($"trying to create new question inside {name}\nline: {lineCount}");
+                    throw new SyntaxErrorException($"trying to create new question inside question({name})\nline: {lineCount}");
                 if (endClozeRegex.IsMatch(trimmedCurLine))
                     throw new SyntaxErrorException($"trying to end cloze question, that doesn't exist\nline: {lineCount}");
                 if (endRegex.IsMatch(trimmedCurLine) == false)
@@ -65,11 +65,11 @@ namespace ClozeQuesConverter
             }
             var bodyStr = body.ToString();
             if (endFlag == false)
-                throw new SyntaxErrorException($"couldn't find end in {name}\nline: {lineCount}");
+                throw new SyntaxErrorException($"couldn't find end in question({name})\nline: {lineCount}");
             if (string.IsNullOrEmpty(bodyStr))
                 return null;
             if (clozeCount == 0)
-                throw new SyntaxErrorException($"question must contain at least one cloze question\n line: {lineCount}");
+                throw new SyntaxErrorException($"question ({name}) must contain at least one cloze question\nline: {lineCount}");
             return new Question(name, bodyStr, shuffleAnswers);
         }
 
@@ -255,10 +255,12 @@ namespace ClozeQuesConverter
                 {
                     Console.WriteLine("Проблемы с доступом к файлу");
                     Console.WriteLine(ex.Message + "\n");
+                    continue;
                 }
                 catch (IOException ex)
                 {
                     Console.WriteLine(ex.Message + "\n");
+                    continue;
                 }
 
                 Console.WriteLine("Файл успешно сохранен\n");
