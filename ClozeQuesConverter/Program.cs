@@ -183,15 +183,16 @@ namespace ClozeQuesConverter
             FileInfo input;
             while (true)
             {
+                Console.WriteLine("Введите имя файла (Расширение .txt)");
                 input = new FileInfo(Console.ReadLine());
                 if (input.Exists == false)
                 {
-                    Console.WriteLine("Файл не существует");
+                    Console.WriteLine("Файл не существует\n");
                     continue;
                 }
                 if (input.Extension != ".txt")
                 {
-                    Console.WriteLine("Расширение должно быть .txt");
+                    Console.WriteLine("Расширение должно быть .txt\n");
                     continue;
                 }
                 break;
@@ -236,8 +237,6 @@ namespace ClozeQuesConverter
         {
             while (true)
             {
-                Console.WriteLine("Введите имя файла (Расширение .txt)");
-
                 var input = GetFileConsole();
                 var output = new FileInfo(Path.Combine(input.DirectoryName, txtRegex.Replace(input.Name, ".xml")));
 
@@ -264,7 +263,6 @@ namespace ClozeQuesConverter
                 }
 
                 Console.WriteLine($"Файл {output.Name} успешно сохранен в {output.DirectoryName}\n");
-
             }
         }
     }
