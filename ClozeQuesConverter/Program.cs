@@ -103,8 +103,15 @@ namespace ClozeQuesConverter
                     //TODO: add answers check
                     // check body and feedback
                     if (result.IsNumerical())
+                    {
                         if (CheckNumericalAnswer(currentAnswer.Body) == false)
                             throw new SyntaxErrorException($"wrong format\nline: {lineCount}");
+                    } else 
+                    { 
+                        SearchingMistakes(currentAnswer.Body, ref lineCount); 
+                        if (string.IsNullOrEmpty(currentAnswer.Feedback) == false)
+                            SearchingMistakes(currentAnswer.Feedback, ref lineCount); 
+                    }
                     result.Answers.Add(currentAnswer);
                 }
                 else { endClozeFlag = true; break; }
@@ -243,6 +250,15 @@ namespace ClozeQuesConverter
                     Console.WriteLine("Синтаксическая ошибка");
                     Console.WriteLine(ex.Message + "\n");
                     continue;
+                }
+                catch (UnauthorizedAccessException ex)
+                {
+                    Console.WriteLine("Проблемы с доступом к файлу");
+                    Console.WriteLine(ex.Message + "\n");
+                }
+                catch (IOException ex)
+                {
+                    Console.WriteLine(ex.Message + "\n");
                 }
 
                 Console.WriteLine("Файл успешно сохранен\n");
