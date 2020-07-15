@@ -237,80 +237,16 @@ namespace ClozeQuesConverter
             return true;
         }
 
-        static bool Check2(string s)
+        static void Check3(string s)
         {
-            Regex regex = new Regex(@"^%-?\d+%(.*?)<feedback>(.*)$");
-            if (regex.IsMatch(s) == false)
-                return false;
-            else
+            int i = 0;
+            while (i <= s.Length - 1)
             {
-                var groups = Regex.Match(s, @"^%-?\d+%(.*?)<feedback>(.*)$");
-                string sub1 = groups.Groups[1].Value;
-                string sub2 = groups.Groups[2].Value;
-                int i = 0;
-                while (i <= sub1.Length - 1)
-                {
-                    if ((sub1[i]=='}')|| (sub1[i] == '#') || (sub1[i] == '~') || (sub1[i] == '/') || (sub1[i] == '\"'))
-                    {
-                        if (i == 0)
-                        {
-                            return false;
-                        }
-                        else
-                        {
-                            if (sub1[i - 1] != '\\') return false;  
-                        }
-                    }
-                    if (sub1[i] == '\\')
-                    {
-                        if (i < sub1.Length - 1)
-                        {
-                            if ((sub1[i + 1] == '}') || (sub1[i + 1] == '#') || (sub1[i + 1] == '~') || (sub1[i + 1] == '/') || (sub1[i + 1] == '\"') || (sub1[i + 1] == '\\')) i++;
-                            else
-                            {
-                                return false;
-                            }
-                            
-                        }
-                        
-                    }
-                    if ((i == sub1.Length - 1)&&(sub1[i] == '\\')&&(sub1[i-1]!='\\')) return false;
-                    i++;
-                }
-                i = 0;
-                while (i <= sub2.Length - 1)
-                {
-                    if ((sub2[i] == '}') || (sub2[i] == '#') || (sub2[i] == '~') || (sub2[i] == '/') || (sub2[i] == '\"'))
-                    {
-                        if (i == 0)
-                        {
-                            return false;
-                        }
-                        else
-                        {
-                            if (sub2[i - 1] != '\\') return false;
-                        }
-                    }
-                    if (sub2[i] == '\\')
-                    {
-                        if (i < sub2.Length - 1)
-                        {
-                            if ((sub2[i + 1] == '}') || (sub2[i + 1] == '#') || (sub2[i + 1] == '~') || (sub2[i + 1] == '/') || (sub2[i + 1] == '\"') || (sub2[i + 1] == '\\')) i++;
-                            else
-                            {
-                                return false;
-                            }
-
-                        }
-
-                    }
-                    if ((i == sub2.Length - 1) && (sub2[i] == '\\') && (sub2[i - 1] != '\\')) return false;
-                    i++;
-                }
-                return true;
+                if ((s[i] == '}') || (s[i] == '#') || (s[i] == '~') || (s[i] == '/') || (s[i] == '\"') || (s[i] == '\"'))
+                    Console.WriteLine("Обратите внимание на "+i+"-ый символ!("+s[i]+")Так как он может нести двойное значение.");
+                i++;
             }
         }
-
         static void Check1(string s)
         {
             Regex regex = new Regex(@"{[0-9]{1,}:SHORTANSWER:(=|%).+}");
