@@ -21,3 +21,5 @@
 \</cloze>
 <br>
 Пример в файле test.txt
+# Скачать
+<a href="https://github.com/romamihalich/ClozeQuesConverter/releases/download/v1.01/ClozeQuesConverter.v1.zip">ClozeQuesConverter v1</a>
