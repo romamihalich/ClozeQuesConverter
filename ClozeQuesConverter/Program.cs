@@ -120,8 +120,12 @@ namespace ClozeQuesConverter
             }
             if (endClozeFlag == false)
                 throw new SyntaxErrorException($"couldn't find end in cloze question\nline: {lineCount}");
-            if (result.Answers.Count == 0)
+            var ansCount = result.Answers.Count;
+            if (ansCount == 0)
                 throw new SyntaxErrorException($"cloze question must contain at least one answer\nline: {lineCount}");
+            if ((result.IsMultichoice() || result.IsMultiresponse())
+                && ansCount < 2)
+                throw new SyntaxErrorException($"this type of cloze question must contain at least 2 answers\nline {lineCount}");
             if (result.IsMultiresponse() == false) 
                 if (result.Answers.Where(x => (x.Percentage == 100)).Count() == 0)
                     throw new SyntaxErrorException($"cloze question must contain at least one answer with 100%\nline: {lineCount}");
